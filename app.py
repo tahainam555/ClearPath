@@ -12,6 +12,10 @@ import cv2
 from depth_estimator import DepthEstimator
 from zone_analyzer import analyze_zones
 from alert_engine import generate_alert
+from flask import request
+import numpy as np
+import cv2
+import base64
 
 # App setup
 app = Flask(__name__)
@@ -85,6 +89,39 @@ def settings():
         return jsonify({'status': 'ok', 'threshold': danger_threshold})
     except Exception:
         return jsonify({'status': 'error', 'message': 'invalid threshold'}), 400
+
+
+@app.route('/upload', methods=['POST'])
+def upload_image():
+    """Accept an uploaded image file, run depth estimation and return results.
+
+    Expects multipart/form-data with field 'image'. Returns JSON:
+      {image: data_url, zones: {...}, alert: str|null}
+    """
+    if 'image' not in request.files:
+        return jsonify({'status': 'error', 'message': 'no image provided'}), 400
+
+    file = request.files['image']
+    data = file.read()
+    # Convert bytes to numpy array then to OpenCV BGR image
+    arr = np.frombuffer(data, np.uint8)
+    img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+    if img is None:
+        return jsonify({'status': 'error', 'message': 'invalid image'}), 400
+
+    try:
+        depth_gray, vis_bgr = estimator.estimate(img)
+        zones = analyze_zones(depth_gray, threshold=danger_threshold)
+        alert_msg = generate_alert(zones)
+
+        _, buf = cv2.imencode('.jpg', vis_bgr)
+        b64 = base64.b64encode(buf).decode('ascii')
+        data_url = 'data:image/jpeg;base64,' + b64
+
+        return jsonify({'status': 'ok', 'image': data_url, 'zones': zones, 'alert': alert_msg})
+    except Exception as e:
+        print('Upload processing error:', e)
+        return jsonify({'status': 'error', 'message': 'processing failed'}), 500
 
 
 @socketio.on('connect')

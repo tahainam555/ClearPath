@@ -8,6 +8,8 @@
   const status = document.getElementById('status');
   const muteBtn = document.getElementById('muteBtn');
   const slider = document.getElementById('sensitivity');
+  const uploadInput = document.getElementById('uploadInput');
+  const uploadBtn = document.getElementById('uploadBtn');
 
   let muted = false;
   let lastSpoken = 0;
@@ -27,6 +29,48 @@
         }
       }).catch(()=>{
         status.textContent = 'Error updating sensitivity';
+      });
+  });
+
+  // Upload test image handler
+  uploadBtn.addEventListener('click', ()=>{
+    const file = uploadInput.files && uploadInput.files[0];
+    if(!file){
+      status.textContent = 'No image selected';
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append('image', file);
+
+    status.textContent = 'Uploading image...';
+    fetch('/upload', {method:'POST', body: fd})
+      .then(r=>r.json())
+      .then(j=>{
+        if(j.image){
+          img.src = j.image;
+        }
+        if(j.zones){
+          zoneLeft.classList.toggle('danger', !!j.zones.left.danger);
+          zoneCentre.classList.toggle('danger', !!j.zones.centre.danger);
+          zoneRight.classList.toggle('danger', !!j.zones.right.danger);
+        }
+        if(j.alert){
+          status.textContent = j.alert;
+          if(!muted){
+            const now = Date.now();
+            if(now - lastSpoken > COOLDOWN_MS){
+              lastSpoken = now;
+              try{ window.speechSynthesis.speak(new SpeechSynthesisUtterance(j.alert)); }catch(e){}
+            }
+          }
+        } else {
+          status.textContent = 'All clear';
+        }
+      })
+      .catch(err=>{
+        console.error(err);
+        status.textContent = 'Upload failed';
       });
   });
 
