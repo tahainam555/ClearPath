@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ObstacleAware - Assistive navigation system for visually impaired users using AI-powered depth estimation">
+    <title>ObstacleAware</title>
+    
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="../static/style.css">
+    
+    <!-- Socket.IO client library from CDN for real-time WebSocket communication -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- ============ HEADER ============ -->
+    <header class="app-header">
+        <h1 class="app-title">ObstacleAware</h1>
+        <p class="app-subtitle">Assistive Navigation System</p>
+    </header>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="app-main">
+        
+        <!-- ============ DEPTH FEED SECTION ============ -->
+        <section class="depth-feed-section">
+            <div class="depth-feed-container">
+                <img 
+                    id="depth-feed" 
+                    class="depth-feed-image" 
+                    src="" 
+                    alt="Live depth map from camera"
+                >
+                <div class="depth-feed-placeholder">Connecting to camera...</div>
+            </div>
+        </section>
+
+        <!-- ============ ZONE STATUS PANEL ============ -->
+        <section class="zone-panel">
+            <div class="zone-card" id="zone-left">
+                <div class="zone-label">LEFT</div>
+                <div class="zone-status">CLEAR</div>
+            </div>
+            <div class="zone-card" id="zone-centre">
+                <div class="zone-label">CENTRE</div>
+                <div class="zone-status">CLEAR</div>
+            </div>
+            <div class="zone-card" id="zone-right">
+                <div class="zone-label">RIGHT</div>
+                <div class="zone-status">CLEAR</div>
+            </div>
+        </section>
+
+        <!-- ============ ALERT BAR ============ -->
+        <section class="alert-section">
+            <div id="alert-text" class="alert-text">Waiting for depth analysis...</div>
+        </section>
+
+        <!-- ============ CONTROLS ROW ============ -->
+        <section class="controls-section">
+            <div class="slider-control">
+                <label for="sensitivity" class="sensitivity-label">Detection Sensitivity</label>
+                <input 
+                    type="range" 
+                    id="sensitivity" 
+                    class="sensitivity-slider" 
+                    min="100" 
+                    max="240" 
+                    value="180"
+                    title="Adjust how close an obstacle must be to trigger an alert (0-255)"
+                >
+                <span class="sensitivity-value" id="sensitivity-value">180</span>
+            </div>
+            <button id="mute-btn" class="mute-button" title="Toggle audio alerts">🔊 Mute</button>
+        </section>
+
+    </main>
+
+    <!-- ============ STATUS BAR ============ -->
+    <footer class="status-bar">
+        <div id="connection-status" class="connection-status">Connecting...</div>
+    </footer>
+
+    <!-- External JavaScript - loaded at end of body for optimal page load performance -->
+    <script src="../static/script.js"></script>
+</body>
+</html>

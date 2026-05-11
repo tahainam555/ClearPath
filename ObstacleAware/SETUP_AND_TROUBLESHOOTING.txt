@@ -1,0 +1,686 @@
+"""
+OBSTACLEAWARE — SETUP, TESTING, AND TROUBLESHOOTING GUIDE
+==========================================================
+
+This document provides all necessary commands and troubleshooting for the
+ObstacleAware obstacle avoidance assistive tool project.
+
+Reference: Ranftl et al. (2022). "Towards Robust Monocular Depth Estimation"
+           Intel MiDaS, available at: https://github.com/isl-org/MiDaS
+"""
+
+# ============================================================================
+# 1. INSTALLATION COMMANDS
+# ============================================================================
+
+STEP 1: NAVIGATE TO PROJECT DIRECTORY
+--------------------------------------
+Windows PowerShell:
+  cd e:\Taha\CV\ClearPath\ClearPath\ObstacleAware
+
+Linux/Mac Terminal:
+  cd /path/to/ObstacleAware
+
+
+STEP 2: CREATE AND ACTIVATE PYTHON VIRTUAL ENVIRONMENT (RECOMMENDED)
+----------------------------------------------------------------------
+Windows PowerShell:
+  python -m venv venv
+  .\venv\Scripts\Activate.ps1
+
+Linux/Mac Terminal:
+  python3 -m venv venv
+  source venv/bin/activate
+
+
+STEP 3: UPGRADE PIP
+-------------------
+Windows PowerShell:
+  python -m pip install --upgrade pip
+
+Linux/Mac Terminal:
+  python3 -m pip install --upgrade pip
+
+
+STEP 4: INSTALL ALL PROJECT DEPENDENCIES
+------------------------------------------
+Windows PowerShell:
+  pip install -r requirements.txt
+
+Linux/Mac Terminal:
+  pip3 install -r requirements.txt
+
+⏱️  EXPECTED TIME: 5-15 minutes (depends on internet speed and system specs)
+
+Note: This will download:
+  - Flask (web framework)
+  - Flask-SocketIO (WebSocket support)
+  - OpenCV (computer vision)
+  - PyTorch (deep learning framework) — ~500 MB
+  - Torchvision (PyTorch models)
+  - Timm (vision models)
+  - Numpy (numerical computing)
+  - Eventlet (async I/O)
+
+
+# ============================================================================
+# 2. TEST PIPELINE COMMANDS (NO WEBCAM REQUIRED)
+# ============================================================================
+
+RUN PIPELINE TEST
+------------------
+Windows PowerShell:
+  python test_pipeline.py
+
+Linux/Mac Terminal:
+  python3 test_pipeline.py
+
+WHAT THIS DOES:
+  ✓ Tests DepthEstimator with dummy black frame (simulates close obstacles)
+  ✓ Tests DepthEstimator with dummy white frame (simulates clear path)
+  ✓ Tests ZoneAnalyzer on both frames
+  ✓ Tests AlertEngine alert generation
+  ✓ Tests threshold update functionality
+  ✓ No webcam or network required
+
+EXPECTED OUTPUT:
+  ============================================================
+    1. INITIALIZING MODULES
+  ============================================================
+  [Test] Initializing DepthEstimator...
+  ✅ DepthEstimator initialized successfully
+  [Test] Initializing ZoneAnalyzer...
+  ✅ ZoneAnalyzer initialized successfully
+  [Test] Initializing AlertEngine...
+  ✅ AlertEngine initialized successfully
+
+  ... (detailed test results for each frame)
+
+  ============================================================
+    5. TEST SUMMARY
+  ============================================================
+  ✅ All modules initialized successfully
+  Pipeline is ready for deployment!
+
+
+# ============================================================================
+# 3. RUN THE MAIN APPLICATION
+# ============================================================================
+
+IMPORTANT PREREQUISITES:
+  ✓ Webcam connected to your device
+  ✓ Python virtual environment activated (if created)
+  ✓ All dependencies installed (step 2 complete)
+  ✓ Camera permissions granted to Python
+
+
+START THE FLASK SERVER
+-----------------------
+Windows PowerShell:
+  python app.py
+
+Linux/Mac Terminal:
+  python3 app.py
+
+EXPECTED OUTPUT:
+  [App] Starting ObstacleAware Flask server...
+  [App] Access the app at: http://localhost:5000 or http://<your-ip>:5000
+  [App] Initializing depth estimator...
+  [DepthEstimator] Loading MiDaS small model from torch.hub...
+  [DepthEstimator] Model loaded successfully.
+  [DepthEstimator] Loading MiDaS transform pipeline...
+  [DepthEstimator] Transform pipeline loaded successfully.
+  [App] Initializing zone analyzer...
+  [ZoneAnalyzer] Initialized with threshold=180
+  [App] Initializing alert engine...
+  [AlertEngine] Initialized
+  [App] Access the app at: http://localhost:5000 or http://<your-ip>:5000
+   * Running on http://0.0.0.0:5000
+
+SERVER IS NOW RUNNING AND READY FOR CONNECTIONS
+
+TO STOP THE SERVER:
+  Press Ctrl+C in the terminal
+
+
+# ============================================================================
+# 4. ACCESS THE APP ON LAPTOP / DESKTOP BROWSER
+# ============================================================================
+
+LOCAL DEVICE ONLY:
+  Open web browser and go to:
+    http://localhost:5000
+
+You should see:
+  ✓ "ObstacleAware" header with "Assistive Navigation System" subtitle
+  ✓ Large live depth feed area (will show "Connecting to camera...")
+  ✓ 3 zone cards (LEFT / CENTRE / RIGHT) initially showing CLEAR (green)
+  ✓ Alert bar showing "Waiting for depth analysis..."
+  ✓ Sensitivity slider set to 180
+  ✓ Mute button (🔊 Mute)
+  ✓ Connection status at bottom ("Connected ✅")
+
+
+# ============================================================================
+# 5. ACCESS THE APP ON MOBILE (SMARTPHONE / TABLET)
+# ============================================================================
+
+STEP 1: FIND YOUR COMPUTER'S LOCAL IP ADDRESS
+-----------------------------------------------
+Windows PowerShell:
+  ipconfig
+
+Look for "IPv4 Address" under your network adapter (usually 192.168.x.x or 10.x.x.x)
+
+Example output:
+  Ethernet adapter Ethernet:
+    IPv4 Address. . . . . . . . . . . : 192.168.1.100
+
+Linux/Mac Terminal:
+  ifconfig  (or  ip addr)
+
+Look for "inet" address (usually 192.168.x.x or 10.x.x.x)
+
+Example output:
+  wlan0: flags=...
+    inet 192.168.1.100  netmask 255.255.255.0
+
+
+STEP 2: ENSURE MOBILE AND COMPUTER ON SAME WiFi NETWORK
+---------------------------------------------------------
+  ✓ Connect your smartphone/tablet to the same WiFi network
+  ✓ DO NOT use mobile data; must be on same local network
+
+
+STEP 3: OPEN BROWSER ON MOBILE DEVICE
+---------------------------------------
+  Open Safari (iOS) or Chrome (Android)
+
+  Navigate to:
+    http://192.168.1.100:5000
+
+  (Replace 192.168.1.100 with your actual IP address from Step 1)
+
+
+STEP 4: GRANT CAMERA PERMISSIONS
+---------------------------------
+  When prompted, allow the browser to access your computer's camera
+  (Most mobile browsers will show a permission popup)
+
+
+STEP 5: VERIFY MOBILE CONNECTION
+----------------------------------
+  ✓ Depth feed should start showing live depth map
+  ✓ Zone cards should update (CLEAR/DANGER)
+  ✓ Alert messages should appear
+  ✓ Connection status shows "Connected ✅"
+  ✓ Audio alerts should speak when obstacles detected (if not muted)
+
+
+PORTRAIT LAYOUT (RECOMMENDED FOR MOBILE):
+  The app is optimized for portrait orientation (vertical)
+  
+  Layout from top to bottom:
+    [Header: ObstacleAware]
+    [Live Depth Feed Area]
+    [3 Zone Cards: LEFT | CENTRE | RIGHT]
+    [Alert Message Bar]
+    [Sensitivity Slider | Mute Button]
+    [Connection Status]
+
+
+TROUBLESHOOTING MOBILE CONNECTION:
+  ❌ "Cannot connect to 192.168.1.100:5000"
+     → Verify computer IP with ipconfig / ifconfig
+     → Ensure mobile on same WiFi network
+     → Check firewall allows port 5000 (see error #5)
+
+  ❌ "Connection refused"
+     → Verify Flask server is running on computer
+     → Check no other app is using port 5000
+
+  ❌ "No camera feed appears"
+     → Webcam might not be accessible from Flask app
+     → Try running test_pipeline.py first
+     → Check webcam is plugged in and not in use by other apps
+
+
+# ============================================================================
+# 6. COMMON ERRORS AND EXACT FIXES
+# ============================================================================
+
+ERROR #1: MiDaS MODEL DOWNLOAD FAILURE
+======================================
+
+Symptoms:
+  RuntimeError: Failed to load MiDaS model: [SSL: CERTIFICATE_VERIFY_FAILED]
+  or
+  RuntimeError: Failed to load MiDaS model: urlopen error...
+
+Root Cause:
+  - Internet connection issue
+  - Firewall blocking torch.hub download
+  - SSL certificate validation error
+
+EXACT FIXES:
+
+Fix 1a (Offline Mode - If Model Already Cached):
+  The first run downloads the model (~300 MB) and caches it locally.
+  Subsequent runs use the cached model (no download needed).
+  If model is cached, just run again:
+    python app.py
+
+Fix 1b (Verify Internet Connection):
+  Windows PowerShell:
+    ping www.google.com
+  
+  Linux/Mac Terminal:
+    ping -c 4 www.google.com
+  
+  You should see responses. If not, check your internet.
+
+Fix 1c (Disable SSL Verification - TEMPORARY):
+  Edit depth_estimator.py line ~46, change to:
+  
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+    self.model = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
+  
+  (Not recommended for production, but useful for development)
+
+Fix 1d (Pre-download Model Manually):
+  Windows PowerShell:
+    python -c "import torch; torch.hub.load('intel-isl/MiDaS', 'MiDaS_small')"
+  
+  Linux/Mac Terminal:
+    python3 -c "import torch; torch.hub.load('intel-isl/MiDaS', 'MiDaS_small')"
+  
+  Wait for ~5 minutes. Model will be cached locally.
+
+Fix 1e (Check Firewall):
+  Windows Defender / Antivirus may block torch.hub.
+  Temporarily disable firewall for testing:
+  
+  Windows:
+    - Settings → Privacy & Security → Windows Defender Firewall
+    - Turn off firewall (TEMPORARILY for testing only)
+    - Turn back on when done
+
+Fix 1f (Use Alternative Download Method):
+  If torch.hub continues to fail, manually download:
+    https://github.com/isl-org/MiDaS/releases/tag/v2_1
+  
+  Download: "dpt_small.pt"
+  
+  Then modify depth_estimator.py to load locally (advanced)
+
+
+ERROR #2: WEBCAM NOT FOUND / CANNOT OPEN CAMERA
+================================================
+
+Symptoms:
+  [ProcessThread] ERROR: Failed to open webcam. Ensure camera is connected.
+  or
+  cv2.error: (-215:Assertion failed) cap.isOpened()
+
+Root Cause:
+  - Webcam not plugged in
+  - Webcam in use by another application
+  - Camera permissions not granted to Python
+  - Wrong camera index (0 is default)
+
+EXACT FIXES:
+
+Fix 2a (Check Webcam is Connected):
+  Unplug webcam, wait 5 seconds, plug back in.
+  Restart the app:
+    python app.py
+
+Fix 2b (Check Webcam Not in Use):
+  Close all other applications that might use camera:
+    - Zoom / Teams / Skype
+    - Web browsers (with camera access)
+    - OBS / streaming software
+    - Video chat apps
+  
+  Then restart app.
+
+Fix 2c (Grant Camera Permissions):
+  Windows:
+    Settings → Privacy & Security → Camera
+    Ensure "App permissions" allows Python access
+  
+  Linux:
+    Run in terminal:
+      sudo usermod -a -G video $USER
+    Then logout and login again
+
+  Mac:
+    System Preferences → Security & Privacy → Camera
+    Ensure terminal/IDE has camera access
+
+Fix 2d (Test Webcam with OpenCV):
+  Create test_webcam.py:
+    import cv2
+    cap = cv2.VideoCapture(0)
+    if cap.isOpened():
+        print("✅ Webcam working!")
+        ret, frame = cap.read()
+        print(f"Frame size: {frame.shape}")
+        cap.release()
+    else:
+        print("❌ Webcam not found!")
+  
+  Run:
+    python test_webcam.py
+
+Fix 2e (Try Different Camera Index):
+  Edit app.py line ~84:
+    cap = cv2.VideoCapture(0)  # Change 0 to 1, 2, etc.
+  
+  Try 0, 1, 2 until one works.
+
+Fix 2f (USB Port Issue):
+  Try different USB port on computer.
+  Some ports may have power management enabled.
+
+
+ERROR #3: SOCKETIO CONNECTION ISSUES / "Disconnected ❌"
+========================================================
+
+Symptoms:
+  Mobile shows "Disconnected ❌"
+  or
+  Browser console shows: "WebSocket connection failed"
+  or
+  "Could not connect to the development server"
+
+Root Cause:
+  - Server not running on computer
+  - Mobile/browser on different network
+  - Firewall blocking port 5000
+  - Wrong IP address
+
+EXACT FIXES:
+
+Fix 3a (Verify Server is Running):
+  Check terminal where you ran app.py shows:
+    * Running on http://0.0.0.0:5000
+  
+  If not, restart:
+    python app.py
+
+Fix 3b (Verify Network Connection):
+  Computer:
+    Windows PowerShell:
+      ipconfig
+    
+    Find IPv4 Address (e.g., 192.168.1.100)
+  
+  Mobile:
+    Verify it's on SAME WiFi network
+    (Check WiFi name matches computer's WiFi)
+
+Fix 3c (Verify Correct URL on Mobile):
+  Browser address bar should show:
+    http://192.168.1.100:5000
+  
+  NOT:
+    http://localhost:5000  (localhost = mobile's own device)
+    http://127.0.0.1:5000  (loopback address)
+
+Fix 3d (Disable Firewall Temporarily for Testing):
+  Windows:
+    Settings → Windows Defender Firewall
+    → Turn firewall OFF (temporarily)
+  
+  Linux:
+    sudo ufw disable  (temporarily)
+    sudo ufw enable   (when done)
+  
+  If app works with firewall off, add exception:
+    Windows: Firewall → Allow app through firewall → Python
+
+Fix 3e (Check Port 5000 Not in Use):
+  Windows PowerShell:
+    netstat -ano | findstr :5000
+  
+  Linux/Mac:
+    lsof -i :5000
+  
+  If a process is using it, either:
+    - Kill the process
+    - Change port in app.py line 456:
+        socketio.run(app, host='0.0.0.0', port=5001, debug=False)
+
+Fix 3f (Check CORS Settings):
+  If mobile connects but data doesn't flow:
+  
+  Edit app.py line 25:
+    socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
+  
+  This is already set to "*" (allow all origins). If still issues:
+    cors_allowed_origins=["http://192.168.1.100:5000"]
+
+Fix 3g (Browser Console Debugging):
+  On mobile, open browser console:
+    Chrome: Long press → Inspect
+    Safari: Settings → Advanced → Web Inspector
+  
+  Look for WebSocket connection messages in console.
+  Search for "connect_error" or "ERR_TIMED_OUT"
+
+
+ERROR #4: TORCH / PYTORCH IMPORT ERRORS
+========================================
+
+Symptoms:
+  ModuleNotFoundError: No module named 'torch'
+  or
+  ImportError: cannot import name 'torch' from partially initialized module
+  or
+  "RuntimeError: Trying to backward through the graph a second time"
+
+Root Cause:
+  - PyTorch not installed
+  - Wrong Python interpreter (venv not activated)
+  - Conflicting Python versions
+  - Corrupted installation
+
+EXACT FIXES:
+
+Fix 4a (Verify venv Activated):
+  Check terminal prompt shows (venv) prefix:
+    (venv) PS C:\ObstacleAware>   ← correct
+    PS C:\ObstacleAware>           ← wrong (venv not active)
+  
+  Activate venv:
+    Windows: .\venv\Scripts\Activate.ps1
+    Linux/Mac: source venv/bin/activate
+
+Fix 4b (Reinstall PyTorch):
+  Windows PowerShell:
+    pip uninstall torch torchvision -y
+    pip install torch torchvision
+  
+  Linux/Mac Terminal:
+    pip3 uninstall torch torchvision -y
+    pip3 install torch torchvision
+
+Fix 4c (Check Python Version):
+  Windows PowerShell:
+    python --version
+  
+  Linux/Mac Terminal:
+    python3 --version
+  
+  Should be 3.8 or higher.
+  If 3.10+, use:
+    pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+Fix 4d (Clear pip cache and reinstall all):
+  Windows PowerShell:
+    pip cache purge
+    pip install -r requirements.txt --no-cache-dir
+  
+  Linux/Mac Terminal:
+    pip3 cache purge
+    pip3 install -r requirements.txt --no-cache-dir
+
+Fix 4e (Use System Python for Larger Projects):
+  If venv issues persist:
+    pip install -r requirements.txt --user
+  
+  Then run without venv:
+    python app.py
+
+
+ERROR #5: CORS / NETWORK ACCESS BLOCKED ON MOBILE
+==================================================
+
+Symptoms:
+  Mobile browser shows: "No Access-Control-Allow-Origin header"
+  or
+  Mobile cannot access /settings endpoint
+  or
+  Zone updates don't reach mobile browser
+
+Root Cause:
+  - Browser CORS policy blocking requests
+  - Firewall blocking cross-network requests
+  - Server not configured for remote access
+
+EXACT FIXES:
+
+Fix 5a (Verify CORS Already Enabled):
+  Check app.py line 25 has:
+    socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
+  
+  (Already set to allow all origins in our code)
+
+Fix 5b (Add CORS Header to Flask):
+  Install flask-cors:
+    pip install flask-cors
+  
+  Edit app.py, add after imports:
+    from flask_cors import CORS
+    CORS(app, origins="*")
+  
+  Add after app initialization (line ~20):
+    CORS(app, resources={r"/*": {"origins": "*"}})
+
+Fix 5c (Disable Firewall for Testing):
+  Windows:
+    Settings → Windows Defender Firewall
+    → Inbound Rules → Create New Rule
+    → Program: Python.exe
+    → Allow connection
+  
+  Linux:
+    sudo ufw allow 5000
+
+Fix 5d (Use --allow-external-connections Flag):
+  Edit app.py main block:
+    socketio.run(
+        app,
+        host='0.0.0.0',
+        port=5000,
+        debug=False,
+        allow_unsafe_werkzeug=True  ← add this
+    )
+
+Fix 5e (Change Flask to Production Server):
+  Install production server:
+    pip install gunicorn
+  
+  Run with:
+    gunicorn --worker-class eventlet -w 1 app:app --bind 0.0.0.0:5000
+  
+  This bypasses Flask development server limitations
+
+Fix 5f (Test with curl / postman):
+  Verify /settings endpoint works:
+  
+  Windows PowerShell:
+    Invoke-RestMethod -Uri "http://192.168.1.100:5000/settings" `
+      -Method POST `
+      -Body '{"threshold": 150}' `
+      -ContentType "application/json"
+  
+  Linux/Mac Terminal:
+    curl -X POST http://192.168.1.100:5000/settings \
+      -H "Content-Type: application/json" \
+      -d '{"threshold": 150}'
+  
+  If this works, issue is on mobile browser, not server.
+
+
+# ============================================================================
+# 7. QUICK REFERENCE CHEAT SHEET
+# ============================================================================
+
+FIRST TIME SETUP:
+  1. cd e:\Taha\CV\ClearPath\ClearPath\ObstacleAware
+  2. python -m venv venv
+  3. .\venv\Scripts\Activate.ps1
+  4. pip install -r requirements.txt  (wait 10-15 minutes)
+  5. python test_pipeline.py          (verify installation)
+
+DAILY STARTUP:
+  1. .\venv\Scripts\Activate.ps1      (if not already active)
+  2. python app.py                    (start server)
+  3. Open http://localhost:5000       (or http://ip:5000 on mobile)
+
+MOBILE ACCESS:
+  1. Find IP: ipconfig → IPv4 Address (e.g., 192.168.1.100)
+  2. Mobile WiFi: Connect to same network
+  3. Mobile browser: http://192.168.1.100:5000
+  4. Allow camera permissions when prompted
+
+QUICK TEST (No Webcam):
+  python test_pipeline.py
+
+TROUBLESHOOTING:
+  1. Check server running: terminal shows "Running on http://0.0.0.0:5000"
+  2. Check camera: python test_webcam.py
+  3. Check model: python -c "import torch; torch.hub.load('intel-isl/MiDaS', 'MiDaS_small')"
+  4. Check network: ipconfig (ensure mobile on same WiFi)
+  5. Check firewall: Temporarily disable Windows Defender Firewall
+
+
+# ============================================================================
+# 8. PROJECT FILE STRUCTURE
+# ============================================================================
+
+ObstacleAware/
+├── app.py                      # Flask server with WebSocket
+├── depth_estimator.py          # MiDaS depth estimation
+├── zone_analyzer.py            # Zone-based obstacle detection
+├── alert_engine.py             # Alert message generation
+├── test_pipeline.py            # Testing script (no webcam needed)
+├── requirements.txt            # Python dependencies
+├── templates/
+│   └── index.html              # Mobile-first HTML interface
+└── static/
+    ├── style.css               # Dark theme CSS
+    └── script.js               # WebSocket & UI interactions
+
+
+# ============================================================================
+# 9. PERFORMANCE TIPS
+# ============================================================================
+
+For Faster Performance:
+  ✓ Use smaller depth model: Already using MiDaS_small (optimal)
+  ✓ Reduce frame rate: Edit app.py, change TARGET_FPS = 8 (already 8 FPS)
+  ✓ Disable text-to-speech: Click Mute button on UI
+  ✓ Use Ethernet: WiFi can be slower for mobile access
+  ✓ Close other apps: Free up CPU/RAM for depth estimation
+
+For Better Accuracy:
+  ✓ Adjust sensitivity slider: Lower = closer detection, Higher = farther detection
+  ✓ Use good lighting: Depth estimation works better in well-lit environments
+  ✓ Keep camera clean: Dust reduces depth estimation accuracy
+  ✓ Use 1280x720 resolution: Not too high (slow), not too low (inaccurate)
+
+"""
